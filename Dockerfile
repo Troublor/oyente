@@ -4,7 +4,7 @@ ARG SOLC_VERSION=0.4.19
 FROM ethereum/client-go:${ETHEREUM_VERSION} as geth
 FROM ethereum/solc:${SOLC_VERSION} as solc
 
-FROM ubuntu:bionic as CLI
+FROM ubuntu:bionic as cli
 
 ARG NODEREPO=node_8.x
 
@@ -29,7 +29,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.6 2
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip2 1
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 2
 RUN pip install requests web3
-RUN npm install npm@latest -g  && npm install n --global && n stable
+RUN npm install n --global && n stable
 
 RUN mkdir -p /deps/z3/ &&  wget https://github.com/Z3Prover/z3/archive/z3-4.5.0.zip -O /deps/z3/z3.zip && \
         cd /deps/z3/ && unzip /deps/z3/z3.zip && \
@@ -42,19 +42,21 @@ COPY --from=geth /usr/local/bin/evm /usr/local/bin/evm
 # Install solc from official solc image
 COPY --from=solc /usr/bin/solc /usr/bin/solc
 
+RUN pip install crytic-compile
+
 COPY . /oyente/
 
 WORKDIR /oyente/
 ENTRYPOINT ["python3", "/oyente/oyente/oyente.py"]
 
-FROM CLI as WEB
+# FROM cli as web
 
-RUN wget -O ruby-install-0.6.1.tar.gz https://github.com/postmodern/ruby-install/archive/v0.6.1.tar.gz
-RUN tar -xzvf ruby-install-0.6.1.tar.gz
-RUN cd ruby-install-0.6.1/ && make install
-RUN ruby-install --system ruby 2.4.4
-WORKDIR /oyente/web
-RUN ./bin/yarn install && gem install bundler && bundle install --with development
+# RUN wget -O ruby-install-0.6.1.tar.gz https://github.com/postmodern/ruby-install/archive/v0.6.1.tar.gz
+# RUN tar -xzvf ruby-install-0.6.1.tar.gz
+# RUN cd ruby-install-0.6.1/ && make install
+# RUN ruby-install --system ruby 2.4.4
+# WORKDIR /oyente/web
+# RUN ./bin/yarn install && gem install bundler && bundle install --with development
 
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+# EXPOSE 3000
+# CMD ["./bin/rails", "server"]
