@@ -22,3 +22,4 @@ bytecode.1
 web/vendor/
 
 /python3.6/
+/contracts/

@@ -2445,6 +2445,7 @@ def run(disasm_file=None, source_file=None, source_map=None):
     global g_source_file
     global g_src_map
     global results
+    global begin
 
     g_disasm_file = disasm_file
     g_source_file = source_file
